@@ -10,9 +10,17 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
+- url: /images
+  static_dir: static/images
+
 - url: /robots.txt
   static_files: static/robots.txt
   upload: static/robots.txt
+
+- url: /susol_mark_resume.pdf
+  mime_type: application/pdf
+  static_files: static/susol_mark_resume.pdf
+  upload: static/susol_mark_resume.pdf
 
 - url: .*
   script: main.app
