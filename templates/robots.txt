@@ -1,0 +1,7 @@
+User-Agent: *
+Disallow:
+
+User-Agent: Mediapartners-Google
+Disallow: /
+
+Sitemap: http://www.marksusol.com/index.html

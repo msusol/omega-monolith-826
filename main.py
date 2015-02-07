@@ -30,6 +30,13 @@ class MainHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('templates/index.html')
     self.response.write(template.render(template_values))
 
+class WebmasterTools(webapp2.RequestHandler):
+  def get(self):
+    template_values = {}
+    template = JINJA_ENVIRONMENT.get_template('templates/googlea606b191ba51e6f4.html')
+    self.response.write(template.render(template_values))
+
 app = webapp2.WSGIApplication([
-  ('/', MainHandler)
+  ('/', MainHandler),
+  ('/googlea606b191ba51e6f4.html', WebmasterTools)
 ], debug=True)
