@@ -1,5 +1,5 @@
 User-Agent: *
-Disallow:
+Disallow: /cgi-bin/
 
 User-Agent: Mediapartners-Google
 Disallow: /
