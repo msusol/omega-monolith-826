@@ -1,6 +1,4 @@
 .idea/
+*.iml
 .DS_Store
-.Rproj.user
-.Rhistory
-.RData
-*.Rproj
+*.pyc
