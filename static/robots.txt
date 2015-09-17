@@ -4,4 +4,4 @@ Disallow: /favicon.ico
 User-Agent: Mediapartners-Google
 Disallow: /
 
-Sitemap: http://www.marksusol.com/index.html
+Sitemap: http://www.marksusol.com/sitemap.xml
