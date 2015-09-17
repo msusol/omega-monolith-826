@@ -37,6 +37,6 @@ class WebmasterTools(webapp2.RequestHandler):
     self.response.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-  ('/', MainHandler),
+  ('/.*', MainHandler),
   ('/googlea606b191ba51e6f4.html', WebmasterTools)
 ], debug=True)
