@@ -30,13 +30,33 @@ class MainHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('templates/index.html')
     self.response.write(template.render(template_values))
 
-class WebmasterTools(webapp2.RequestHandler):
+# TODO: https://startbootstrap.com/articles/
+class About(webapp2.RequestHandler):
   def get(self):
     template_values = {}
-    template = JINJA_ENVIRONMENT.get_template('templates/googlea606b191ba51e6f4.html')
+    template = JINJA_ENVIRONMENT.get_template('templates/about.html')
     self.response.write(template.render(template_values))
 
+"""
+class Contact(webapp2.RequestHandler):
+  def get(self):
+    template_values = {}
+    template = JINJA_ENVIRONMENT.get_template('templates/contact.html')
+    self.response.write(template.render(template_values))
+
+class Post(webapp2.RequestHandler):
+    def get(self):
+        template_values = {}
+        template = JINJA_ENVIRONMENT.get_template('templates/post.html')
+        self.response.write(template.render(template_values))
+
+('/about.html', About),
+('/contact.html', Contact),
+('/post.html', Post),
+
+"""
+
 app = webapp2.WSGIApplication([
-  ('/.*', MainHandler),
-  ('/googlea606b191ba51e6f4.html', WebmasterTools)
+  ('/about.html', About),
+  ('/.*', MainHandler)
 ], debug=True)
