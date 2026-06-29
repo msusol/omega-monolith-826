@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Planning Loop</title>
+<meta name="description" content="Treat your plan as a living document, not a one-time artifact — a human-driven loop for building with AI without losing the thread.">
+<link rel="canonical" href="https://losus.ai/articles/the-planning-loop">
+<link rel="shortcut icon" href="/images/favicon.ico">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/namari-color.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+<style>
+  .article-wrap{max-width:760px;margin:0 auto;padding:40px 20px 80px;}
+  .article-nav{display:flex;gap:24px;padding:20px 0;font-weight:600;}
+  .article-nav a{text-decoration:none;}
+  .article-meta{color:#888;font-size:.9em;margin-bottom:32px;}
+  .article-body{line-height:1.7;font-size:1.05em;}
+  .article-body pre{background:#1e1e1e;color:#eee;padding:16px;border-radius:6px;overflow:auto;}
+  .article-body code{font-family:Menlo,Consolas,monospace;font-size:.92em;}
+  .article-body :not(pre) > code{background:#f2f2f2;padding:2px 5px;border-radius:4px;}
+  .article-body img{max-width:100%;height:auto;}
+  .article-body h2{margin-top:1.6em;}
+  .article-list{list-style:none;padding:0;}
+  .article-list li{margin:0 0 28px;}
+  .article-list h2{margin:0 0 4px;font-size:1.3em;}
+  .article-list a{text-decoration:none;}
+  .tag-chip{display:inline-block;background:#f2f2f2;border-radius:12px;padding:2px 10px;margin:4px 4px 0 0;font-size:.8em;color:#555;}
+</style>
+
+</head>
+<body>
+<div class="article-wrap">
+<nav class="article-nav"><a href="/">Home</a><a href="/#about">About</a><a href="/articles">Articles</a></nav>
+<h1>The Planning Loop</h1>
+<div class="article-meta">ai, planning, productivity, devtools</div>
+<div class="article-body">
+<p><em>What people call "vibe planning" is really a loop — and the human stays in the driver's seat.</em></p>
+<h2 id="the-moment-the-model-was-confidently-wrong">The moment the model was confidently wrong</h2>
+<p>I asked Claude to help me stand up a GPU container on an NVIDIA DGX Spark. Early in the session, it told me — politely, fluently, and with total confidence — that I was mistaken about my own hardware:</p>
+<blockquote>
+<p>"Claude's knowledge cutoff is August 2025. NVIDIA released the CUDA 13 toolkit after that date."</p>
+</blockquote>
+<p>The implication was that I should target CUDA 12.x. But the machine in front of me was running CUDA 13.2.1. The model wasn't lying; it was reasoning from a world that ended in August 2025. The DGX Spark lives in a later one.</p>
+<p>That gap — between what the model knows and what is actually true on the metal — is the whole reason this article exists. Hand an AI a problem and it will <em>generate</em>. It will produce a plan, a Dockerfile, a confident paragraph about CUDA versions. What it won't do reliably is <em>think against reality</em>: check the live state, notice when its own assumptions are stale, and record what it learned so the mistake doesn't come back next week.</p>
+<p>That's the human's job. And it turns out you can build a small amount of structure that makes the human good at it — consistently, across very different projects. I've started calling that structure <strong>The Planning Loop</strong>.</p>
+<!-- IMAGE TODO (optional): side-by-side — the model's "CUDA 13 not released" claim vs. the nvidia-smi output showing CUDA 13.2. Add as an absolute URL once created. -->
+
+<h2 id="most-people-write-a-plan-once-thats-the-bug">Most people write a plan once. That's the bug.</h2>
+<p>The default mental model for "planning" is: think hard up front, write the plan, then execute it. The plan is a document you produce <em>before</em> the work and mostly ignore <em>during</em> it.</p>
+<p>That model breaks the instant you're working under real uncertainty — which, with AI in the loop, is always. The model's knowledge is stale in places. The hardware behaves unexpectedly. A dependency you assumed was fine turns out to be load-bearing. A plan written once and frozen is wrong by Tuesday.</p>
+<p>The Planning Loop treats the plan as a <strong>living document maintained under uncertainty</strong>. Concretely, it's a cycle:</p>
+<p><strong>Plan → Implement → Investigate → Decide → Modify → (repeat)</strong></p>
+<p>You define intent. The AI implements a slice. Something surprises you. You investigate it. You make a decision and <em>record</em> it. You modify the plan to reflect what you now know. Then you go again. The AI is a power source <em>inside</em> each step — it drafts, it runs commands, it lays out tradeoffs — but it is not the loop. You are.</p>
+<p><img alt="The Planning Loop framework — the human drives the plow, the AI is the horse, the rules are the harness" src="https://raw.githubusercontent.com/msusol/vibe-planning-dgx-spark-demo/main/images/vibe-planning-framework.png" /></p>
+<p>I keep coming back to the metaphor in that diagram. The human is the farmer driving the plow. Claude is the horse — enormous power, no idea where the field ends. The rules you give the AI are the <strong>harness</strong>: they channel raw capability into straight furrows instead of a trampled field. The plan is the plow, directing where the work bites. And the furrows left behind — your task list and your git history — are the durable record that you actually did the work, in order, on purpose.</p>
+<blockquote>
+<p>"Explicit instructions act as a harness, channeling the AI's raw energy into predictable, structured patterns."</p>
+</blockquote>
+<p>Here's the part that makes this more than a metaphor: <strong>each phase of the loop gets its own configuration.</strong> In my setup, each phase literally has its own rule file and its own home in the repo.</p>
+<table>
+<thead>
+<tr>
+<th>Loop phase</th>
+<th>What I do</th>
+<th>What the AI does</th>
+<th>Lives in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Plan</strong></td>
+<td>Define what + why</td>
+<td>Draft / expand the plan</td>
+<td><code>docs/plans/&lt;feature&gt;.md</code></td>
+</tr>
+<tr>
+<td><strong>Implement</strong></td>
+<td>Approve one task</td>
+<td>Generate code, one commit each</td>
+<td><code>docs/plans/TODO.md</code>, git</td>
+</tr>
+<tr>
+<td><strong>Investigate</strong></td>
+<td>Frame the question</td>
+<td>Separate findings from actions</td>
+<td><code>docs/investigate/</code></td>
+</tr>
+<tr>
+<td><strong>Decide</strong></td>
+<td>Choose among options</td>
+<td>Lay out tradeoffs, write the record</td>
+<td><code>docs/adr/NNNN-*.md</code></td>
+</tr>
+<tr>
+<td><strong>Modify</strong></td>
+<td>Adjust course</td>
+<td>Update the plan in place</td>
+<td>back to <code>docs/plans/</code></td>
+</tr>
+</tbody>
+</table>
+<p>That table is the methodology. Everything below is one trip around it.</p>
+<h2 id="the-demo-one-full-loop-caught-in-the-act">The demo: one full loop, caught in the act</h2>
+<p>The plan started about as minimal as a plan can be — five lines in <code>docs/plans/dgx-docker-compose-gpu.md</code>:</p>
+<ul>
+<li>Verify Docker, Docker Compose, and the NVIDIA container runtime are available</li>
+<li>Create a Dockerfile for a GPU-capable test container</li>
+<li>Create a <code>compose.yaml</code> that requests GPU access</li>
+<li>Run <code>docker compose up gpu-info</code> to verify GPU visibility with <code>nvidia-smi</code></li>
+<li>Run a GPU-backed command through Docker Compose to validate real GPU usage</li>
+</ul>
+<p><strong>Plan.</strong> When I activated the workflow, the synchronization rule did the first useful thing automatically: it generated <code>docs/plans/TODO.md</code> from the plan file, turning intent into a live checklist of GitHub-style checkboxes. The plan and the TODO are now two views of the same truth, kept in sync by a rule.</p>
+<p><strong>Implement.</strong> Task 1 — verify prerequisites — completed cleanly. Docker 29.2.1, Compose v5.0.1, NVIDIA Container Toolkit 1.19.0, an NVIDIA GB10 (Blackwell) reporting driver 580.142. Checkbox ticked, committed.</p>
+<p><strong>Investigate.</strong> Then Task 3 hit a wall. <code>docker compose run</code> failed at container init with a cryptic error:</p>
+<pre><code class="language-text">open /usr/bin/nvidia-cuda-mps-control: no such file or directory
+</code></pre>
+<p>This is exactly the moment the loop is built for. A "vibe" approach guesses and flails. Instead, the work moved into <code>docs/investigate/dgx-prerequisites.md</code>, which forces a discipline: separate <strong>Findings</strong> (what's true) from <strong>Actions Taken</strong> (what I did). The finding was specific and damning:</p>
+<blockquote>
+<p>"Snap confinement fundamentally blocks the NVIDIA container runtime from injecting GPU resources into containers."</p>
+</blockquote>
+<p>The DGX shipped Docker as a snap package. Snap's sandboxing won't let the NVIDIA runtime bind-mount the host driver binaries into the container — so the GPU is visible to the host but unreachable from inside any container. No amount of tweaking <code>compose.yaml</code> fixes that; it's a confinement problem one layer down.</p>
+<p><strong>Decide.</strong> A blocker this structural isn't a code tweak — it's an architectural decision that will outlive this one task. So it became an <strong>Architecture Decision Record</strong>, <code>docs/adr/0001-native-docker-over-snap.md</code>:</p>
+<blockquote>
+<p><strong>Decision:</strong> We will use native Docker Engine from Docker's official apt repository rather than the Ubuntu snap package.</p>
+</blockquote>
+<p>The ADR is the most important artifact in the whole demo, and not because of the decision itself. It's important because of what it does to <em>future</em> sessions. It records three alternatives I considered and rejected — snap with MPS disabled, snap with the <code>opengl</code> interface, direct device bind-mounts — each with a one-line reason it doesn't hold up:</p>
+<blockquote>
+<p>"Direct device + library bind mounts… Works for basic <code>nvidia-smi</code> but breaks for anything requiring full toolkit injection. Not maintainable."</p>
+</blockquote>
+<p>And ADRs are <strong>immutable once accepted</strong>. That's the mechanism that makes the loop compound: the snap-versus-native question is now <em>settled</em>. No future session — mine or the AI's — gets to re-propose snap Docker and burn an afternoon rediscovering why it fails. The decision is memory.</p>
+<p><strong>Modify.</strong> With Docker reinstalled natively, the plan moved again. The <code>Dockerfile</code> and <code>compose.yaml</code> landed (the compose file requesting the GPU through the durable <code>deploy.resources.reservations.devices</code> form, not a brittle hack), and Task 5 ran a real 4096×4096 PyTorch matrix multiply on the GB10. The GPU pegged near 96%. The loop closed.</p>
+<p><img alt="NVIDIA GB10 GPU utilization near 96% during the matrix-multiply workload" src="https://raw.githubusercontent.com/msusol/vibe-planning-dgx-spark-demo/main/images/dgx-spark-dashboard-gpu-meter.png" /></p>
+<p>One more artifact fell out of all this for free: a <code>docs/process/dgx-gpu-workflow.md</code> runbook, so the next person (or the next me) can reproduce the whole thing in three commands. That trail — investigate → ADR → process — wasn't extra work. It's the <em>byproduct</em> of working under the loop.</p>
+<h2 id="the-infrastructure-rules-skills-memory-hooks">The infrastructure: rules, skills, memory, hooks</h2>
+<p>If the loop is the methodology, here's the machinery that enforces it. Four layers, each doing a distinct job.</p>
+<p><strong>Rules are always-on defaults — the operating system.</strong> A set of <code>planning-*</code> rule files load into the model's context at the start of every session, before any tool fires. They define the canonical <code>docs/</code> layout, how plans sync to TODOs, how ADRs are structured, how commits are written. There's no command to remember; the rules are simply <em>present</em>, the way an OS is present. A small script wires them in globally, so every project on my machine inherits the same discipline without copy-pasting config.</p>
+<p><strong>Skills are pulled in on demand — the apps.</strong> Where a rule is always on, a skill fires only when its task type comes up. A <code>/db-drop</code> skill triggers an investigation-first workflow for destructive SQL. A <code>/kaggle:new</code> command scaffolds a competition project. Each is a real, self-contained capability you invoke when you need it and ignore when you don't.</p>
+<p><strong>Memory carries decisions forward — so nothing gets re-litigated.</strong> ADRs are one form of this. Auto-generated project memory is another. The point of both is the same: capture the <em>why</em> alongside the <em>how</em>, so a future session starts from settled ground instead of an empty prompt.</p>
+<p><strong>Hooks enforce at the moment of action — the guardrails.</strong> Some risks aren't reasoning failures; they're specific, irreversible commands. For those, a rule isn't enough — you want a hard stop at execution time. The design principle I've landed on is clean:</p>
+<blockquote>
+<p>"If the risk is a specific runtime Bash event, add a hook. If the risk is a reasoning failure… a rule is sufficient."</p>
+</blockquote>
+<p>So a destructive <code>DROP TABLE</code> or an irreversible notebook push gets a hook that blocks the AI and hands control back to me. A "which folder does this doc belong in" question just gets a rule.</p>
+<p>The unifying idea behind all four layers is a single test for what's worth keeping:</p>
+<blockquote>
+<p>"If a document is expected to matter in 6 months, it should probably live in <code>docs/</code>."</p>
+</blockquote>
+<!-- IMAGE TODO (optional): layered diagram — Rules (always-on) / Skills (on-demand) / Memory (carried forward) / Hooks (gate at tool-use). Add as an absolute URL once created. -->
+
+<h2 id="the-payoff-the-loop-generalizes">The payoff: the loop generalizes</h2>
+<p>The DGX Spark story is <em>one</em> turn of the loop on <em>one</em> infrastructure problem. The real return shows up when the same loop runs across completely different work — which is why I packaged it.</p>
+<p>The rules and skills above don't live only in the demo repo. They're published as a small <strong>plugin marketplace</strong>, and they tier cleanly:</p>
+<ul>
+<li><strong>Tier 1 — the always-on spine:</strong> the planning rules, loaded into every session.</li>
+<li><strong>Tier 2 — a reusable per-domain harness:</strong> for example, a Kaggle plugin that packages the hard-won conventions of an entire problem class once.</li>
+<li><strong>Tier 3 — project specifics:</strong> each project carries only its own <code>docs/plans/</code> — the hardware, the slug, the exact scripts. Never a duplicated config.</li>
+</ul>
+<p>That's what "domain-agnostic but consistently rigorous" actually means: Tiers 1 and 2 hold constant; only Tier 3 changes. The same loop runs an <strong>R&amp;D Kaggle competition</strong> (scaffold, per-run leaderboard tracking, offline submission packaging, a preflight checklist, and a hook that won't let the AI burn my GPU quota on an irreversible notebook push) and a <strong>data pipeline</strong> (a guard that makes destructive SQL impossible without an investigation-first workflow and an explicit, auditable confirmation).</p>
+<p>And here is the thread that ties the whole thing together. Remember the model being confidently wrong about CUDA 13? That one-off insight didn't evaporate when the session ended. It got promoted into a permanent, always-on rule:</p>
+<blockquote>
+<p>"Output from prior Claude or AI sessions is a <strong>hypothesis</strong>, not a verified fact… A claim that 'the migration was never applied' is as likely to be wrong as right — the live system is the only authoritative source."</p>
+</blockquote>
+<p>That is the entire article in one move. An insight earned mid-loop (the model's knowledge is stale) became an investigation, became a recorded decision, and is now codified infrastructure that runs on <em>every</em> project I touch. The same skepticism that caught the CUDA-13 error later caught a near-miss in a completely different domain — a database migration the model swore had never been applied, which the live schema flatly contradicted.</p>
+<p>That's what maintaining a plan under uncertainty actually buys you: the mistakes you make once become the defaults you never make again.</p>
+<h2 id="so-stop-writing-plans-once">So: stop writing plans once</h2>
+<p>The shift is small and it's mostly a mindset. Treat the plan as alive. When the AI surprises you — and it will — don't paper over it; investigate it, decide, record the decision, and modify the plan. Give the AI a harness of always-on rules so its raw capability runs in straight lines. Reach for a skill when the task calls for one, a hook when the risk is irreversible, and memory so you never re-litigate a settled question.</p>
+<p>The plan is a living document. The loop is how you keep it honest. The rules are the harness. And the AI is the horse — not the farmer.</p>
+<hr />
+<p><em>The full demo, including every artifact referenced here, is in <a href="https://github.com/msusol/vibe-planning-dgx-spark-demo"><code>msusol/vibe-planning-dgx-spark-demo</code></a>. The planning rules and domain plugins are in <a href="https://github.com/msusol/claude-code-plugins"><code>msusol/claude-code-plugins</code></a>. A companion piece on running a Kaggle competition through the same loop is coming next.</em></p>
+</div>
+</div>
+</body>
+</html>

@@ -11,6 +11,9 @@ def index():
 
 @app.route("/<path:path>")
 def static_proxy(path):
+    full = os.path.join(WWW_ROOT, path)
+    if os.path.isdir(full):
+        path = path.rstrip("/") + "/index.html"
     return send_from_directory(WWW_ROOT, path)
 
 @app.route("/dashboard")
