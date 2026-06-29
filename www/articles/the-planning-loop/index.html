@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>The Planning Loop</title>
 <meta name="description" content="Treat your plan as a living document, not a one-time artifact — a human-driven loop for building with AI without losing the thread.">
 <link rel="canonical" href="https://losus.ai/articles/the-planning-loop">
@@ -10,11 +10,12 @@
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/namari-color.css">
 <link rel="stylesheet" href="/css/font-awesome.min.css">
+<link href="/css/animate.css" rel="stylesheet" type="text/css">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
 
 <style>
-  .article-wrap{max-width:760px;margin:0 auto;padding:40px 20px 80px;}
-  .article-nav{display:flex;gap:24px;padding:20px 0;font-weight:600;}
-  .article-nav a{text-decoration:none;}
+  /* suppress the full-height parallax hero on article pages */
+  #banner { min-height: 0 !important; background: none !important; }
   .article-meta{color:#888;font-size:.9em;margin-bottom:32px;}
   .article-body{line-height:1.7;font-size:1.05em;}
   .article-body pre{background:#1e1e1e;color:#eee;padding:16px;border-radius:6px;overflow:auto;}
@@ -31,8 +32,49 @@
 
 </head>
 <body>
-<div class="article-wrap">
-<nav class="article-nav"><a href="/">Home</a><a href="/#about">About</a><a href="/articles">Articles</a></nav>
+<div id="preloader">
+    <div id="status" class="la-ball-triangle-path">
+        <div></div><div></div><div></div>
+    </div>
+</div>
+<div class="page-border">
+    <div class="top-border wow fadeInDown animated"></div>
+    <div class="right-border wow fadeInRight animated"></div>
+    <div class="bottom-border wow fadeInUp animated"></div>
+    <div class="left-border wow fadeInLeft animated"></div>
+</div>
+<div id="wrapper">
+    <header id="banner" class="scrollto clearfix">
+        <div id="header" class="nav-collapse">
+            <div class="row clearfix">
+                <div class="col-1">
+                    <div id="logo">
+                        <h1><a href="/" style="color:inherit;text-decoration:none;">Mark Susol</a></h1>
+                        <h2>Boulder/Denver, CO</h2>
+                    </div>
+                    <aside>
+                        <ul class="social-icons">
+                            <li><a target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/marksusol/"><i class="fa fa-linkedin fa-1x"></i><span>LinkedIn</span></a></li>
+                            <li><a target="_blank" title="GitHub" href="https://github.com/msusol"><i class="fa fa-github fa-1x"></i><span>GitHub</span></a></li>
+                        </ul>
+                    </aside>
+                    <nav id="nav-main">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/#about">About</a></li>
+                            <li><a href="/articles">Articles</a></li>
+                        </ul>
+                    </nav>
+                    <div id="nav-trigger"><span></span></div>
+                    <nav id="nav-mobile"></nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main id="content">
+        <section class="introduction scrollto">
+            <div class="row clearfix">
+                <div class="col-1">
 <h1>The Planning Loop</h1>
 <div class="article-meta">ai, planning, productivity, devtools</div>
 <div class="article-body">
@@ -170,6 +212,31 @@
 <hr />
 <p><em>The full demo, including every artifact referenced here, is in <a href="https://github.com/msusol/vibe-planning-dgx-spark-demo"><code>msusol/vibe-planning-dgx-spark-demo</code></a>. The planning rules and domain plugins are in <a href="https://github.com/msusol/claude-code-plugins"><code>msusol/claude-code-plugins</code></a>. A companion piece on running a Kaggle competition through the same loop is coming next.</em></p>
 </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="landing-footer" class="clearfix">
+        <div class="row clearfix">
+            <p id="copyright" class="col-2">Made with love by <a href="https://www.shapingrain.com">ShapingRain</a></p>
+            <ul class="col-2 social-icons">
+                <li><a target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/marksusol/"><i class="fa fa-linkedin fa-1x"></i><span>LinkedIn</span></a></li>
+                <li><a target="_blank" title="GitHub" href="https://github.com/msusol"><i class="fa fa-github fa-1x"></i><span>GitHub</span></a></li>
+            </ul>
+        </div>
+    </footer>
 </div>
+<script src="/js/jquery.1.8.3.min.js"></script>
+<script src="/js/wow.min.js"></script>
+<script src="/js/featherlight.min.js"></script>
+<script src="/js/featherlight.gallery.min.js"></script>
+<script src="/js/jquery.enllax.min.js"></script>
+<script src="/js/jquery.scrollUp.min.js"></script>
+<script src="/js/jquery.easing.min.js"></script>
+<script src="/js/jquery.stickyNavbar.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/images-loaded.min.js"></script>
+<script src="/js/lightbox.min.js"></script>
+<script src="/js/site.js"></script>
 </body>
 </html>
