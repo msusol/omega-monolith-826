@@ -1,0 +1,4 @@
+# Route dashboard.marksusol.com to dashboard service
+dispatch:
+  - url: "dashboard.marksusol.com/*"
+    service: dashboard

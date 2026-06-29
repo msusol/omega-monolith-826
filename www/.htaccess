@@ -1,4 +1,8 @@
-# Redirect HTTPS to HTTP
 RewriteEngine On
-RewriteCond %{HTTPS} on
-RewriteRule (.*) http://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Skip redirects for dashboard.marksusol.com
+RewriteCond %{HTTP_HOST} !^dashboard\.marksusol\.com$ [NC]
+
+# Existing canonical redirect to www
+RewriteCond %{HTTP_HOST} !^www\.marksusol\.com$ [NC]
+RewriteRule ^(.*)$ https://www.marksusol.com/$1 [R=301,L]

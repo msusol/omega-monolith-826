@@ -1,10 +1,16 @@
-runtime: python311
+runtime: python312
+env: standard
+entrypoint: gunicorn -b :$PORT main:app
 
 handlers:
   - url: /
     static_files: www/index.html
     upload: www/index.html
 
-  - url: /(.*)
+  - url: /(.*\.(css|js|png|jpg|ico))
     static_files: www/\1
-    upload: www/(.*)
+    upload: www/(.*\.(css|js|png|jpg|ico))
+
+  # Everything else -> Flask
+  - url: /.*
+    script: auto
